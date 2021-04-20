@@ -24,7 +24,7 @@
       <h2 class="text-center">Make your reservation</h2>
       <br>
       <div class="text-center">
-        <a href="/tables">
+        <a href="/view">
           <button class="btn btn-lg btn-primary">
             <span class="fa fa-list-alt"></span> View Tables</button>
         </a>
@@ -60,7 +60,7 @@
                 <label for="reserve-unique-id">Unique ID</label>
                 <input type="text" class="form-control" id="reserve-unique-id">
               </div>
-              <button type="submit" class="btn btn-primary submit">Submit</button>
+              <button id='submit-btn' type="submit" class="btn btn-primary submit">Submit</button>
             </form>
           </div>
         </div>
@@ -71,63 +71,52 @@
     <footer class="footer">
       <div class="container">
         <p>
-          <a href="/api/tables">API Table Link</a> |
+          <a href="/api/view">API Table Link</a> |
           <a href="/api/waitlist">API Wait List</a>
       </div>
     </footer>
 
   </div>
 
+<script>
+const submitBtn = document.getElementById('submit-btn')
+
+submitBtn.addEventListener('click', (e) => {
+        e.preventDefault();
+        
+        // Question: What does this code do?
+        let newName = document.getElementById('reserve-name').value.trim();
+        let newPhone = document.getElementById('reserve-phone').value.trim();
+        let newEmail = document.getElementById('reserve-email').value.trim();
+        let newID = document.getElementById('reserve-unique-id').value.trim();
+        
+        let newReservation = {
+          name: newName,
+          phone: parseInt(newPhone),
+          email: charAge,
+          ID: parseInt(charFp),
+        };
+
+        // Question: What does this code do??
+        fetch('/api/reservations', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(newReservation),
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            console.log('add.html', data);
+            alert(`Adding character: ${data.name}`);
+          })
+          .catch((error) => {
+            console.error('Error:', error);
+          });
+      });
+</script>
+
 </body>
 
 </html>
 
-<!-- BELOW CODE IS CRITICAL. IT HANDLES HOW FORM DATA IS SENT TO OUR SERVER -->
-<script type="text/javascript">
-  // In this code below we create the Front-end JavaScript which "POSTS" our form data to our express server.
-  // In essence, when the user hits submit, jQuery grabs all of the fields then sends a post request to our api
-  // Our api recognizes the route (/api/tables)... and then runs the associated code (found in api-routes.js).
-  // In this case the associated code "saves" the data to the table-data.js file or waitinglist-data.js file
-
-  $(".submit").on("click", function(event) {
-    event.preventDefault();
-
-    // Here we grab the form elements
-    var newReservation = {
-      customerName: $("#reserve-name").val().trim(),
-      phoneNumber: $("#reserve-phone").val().trim(),
-      customerEmail: $("#reserve-email").val().trim(),
-      customerID: $("#reserve-unique-id").val().trim()
-    };
-
-    console.log(newReservation);
-
-    // This line is the magic. It"s very similar to the standard ajax function we used.
-    // Essentially we give it a URL, we give it the object we want to send, then we have a "callback".
-    // The callback is the response of the server. In our case, we set up code in api-routes that "returns" true or false
-    // depending on if a tables is available or not.
-
-    $.post("/api/tables", newReservation,
-      function(data) {
-
-        // If a table is available... tell user they are booked.
-        if (data) {
-          alert("Yay! You are officially booked!");
-        }
-
-        // If a table is available... tell user they on the waiting list.
-        else {
-          alert("Sorry you are on the wait list");
-        }
-
-        // Clear the form when submitting
-        $("#reserve-name").val("");
-        $("#reserve-phone").val("");
-        $("#reserve-email").val("");
-        $("#reserve-unique-id").val("");
-
-      });
-
-  });
-
-</script>
